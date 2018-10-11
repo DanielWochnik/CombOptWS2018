@@ -6,8 +6,7 @@ Wichtig:
 
   - Die Nutzung dieser Klassen ist ein Angebot, keine Pflicht! Jeder ist frei sich seine eigene Graphenklasse in einer beliebigen Sprache zu schreiben.
   - Ich habe versucht die Klassen und Beispiele so zu generieren, dass diese für einen C++ -fremden Anwender, welcher ein grundsätzliches Verständnis für Objektorientierung hat, verstanden und benutzt werden können. Ob ich Erfolg hatte, wird sich zeigen.
-  -- Fragen immer gerne; am liebsten im Issue-Board dieses Repositories!
-    - Antworten von Studenten sind natürlich (sowohl aus didaktischer Sicht wie auch aus Bequemlichkeit) sehr gerne gesehen!
+    - Fragen immer gerne; am liebsten im Issue-Board dieses Repositories! Antworten von Studenten sind natürlich (sowohl aus didaktischer Sicht wie auch aus Bequemlichkeit) sehr gerne gesehen!
  - Der Code ist nur sehr (!) rudimentär getestet. 
  - Mittels des Makefiles lässt sich der Code sehr einfach in einer Konsole, in welcher Cygwin installiert ist, kompilieren und ausführen.
  ```sh

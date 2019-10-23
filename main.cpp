@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <queue>
+#include <fstream>
 
 // Convenience. If you don't understand just ignore ;)
 using namespace DHBW;
@@ -122,20 +123,45 @@ std::map<size_t, std::vector<VertexId>> determine_connected_comps(Graph & g)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {	
-	// Read graph from input file 
-	Graph g("input/graph1.plain");
-	// Print to console, std::endl is (almost) equivalent to "\n"
+	size_t graph_no = 2;
+	
+	if(argc > 1) {
+		try {
+			graph_no = static_cast<size_t>(std::stoi(argv[1])); 
+		} catch (std::exception const &e) {
+			std::cout << "Failed to cast" << std::endl;
+		}
+	}
+	std::cout << "Graph: " << graph_no << std::endl;
+
+	std::string infile = "input/graph" + std::to_string(graph_no) + ".plain";
+	Graph g(infile);
+	
 	//std::cout << "Max edges: " << determine_vertice_with_max_edges(g) << std::endl;
 	std::map<size_t, std::vector<VertexId>> connected_comps = determine_connected_comps(g);
-	for(auto elem: connected_comps)
-	{
-		std::cout << elem.first << ": ";
-		for(auto v : elem.second)
+	//std::cout << connected_comps.size() << std::endl;
+
+	std::ofstream fp;
+	std::string outfile = "zhk/graph" + std::to_string(graph_no) + ".plain";
+	fp.open(outfile);
+	if(fp) {
+		fp << connected_comps.size() << std::endl;
+		
+		for(auto elem: connected_comps)
 		{
-			std::cout << v << " ";
+			for(auto v : elem.second)
+			{
+				fp << v << " ";
+			}
+			fp << std::endl;
 		}
-		std::cout << std::endl;
+	} else
+	{
+		return 1;
 	}
+
+	return 0;
+	
 }

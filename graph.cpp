@@ -123,6 +123,9 @@ VertexId Graph::add_vertex()
 EdgeId Graph::add_edge(VertexId ep1, VertexId ep2)
 {
 	_edges.emplace_back(num_edges(),ep1,ep2,*this);
+	vertex(ep1).add_edge(num_edges()-1);
+	vertex(ep2).add_edge(num_edges()-1);
+
 	return num_edges()-1;
 }
 

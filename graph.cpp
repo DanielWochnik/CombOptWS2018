@@ -52,6 +52,7 @@ VertexId const & Edge::vertex2() const
 	return _ep2;
 }
 
+
 VertexId const & Edge::other_vertex(VertexId v) const
 {
 	assert(is_adjiazent(v));
@@ -72,13 +73,18 @@ bool Edge::is_adjiazent(VertexId id) const
 
 Edge::Edge(EdgeId id_, VertexId ep1_, VertexId ep2_, Graph const & graph_)
 :
+	_graph(graph_),
 	_id(id_),
 	_ep1(ep1_),
-	_ep2(ep2_),
-	_graph(graph_)
+	_ep2(ep2_)
 {
 	assert(_id >= 0);
 	assert(_ep1 < _graph.num_vertices() and _ep2 < _graph.num_vertices());
+}
+
+EdgeId Edge::id() const
+{
+	return _id;
 }
 
 //////////////////////////////////////

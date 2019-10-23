@@ -85,13 +85,16 @@ public:
 	
 	// checks whether this edge is adjazant with  vertex1
 	bool is_adjiazent(VertexId id) const;
+
+	// Getter for id
+	EdgeId id() const;
 private:
-    //////////////
+    	//////////////
 	// Member 
+	Graph const &  _graph;
 	EdgeId _id;
 	VertexId const _ep1;
 	VertexId const _ep2;
-	Graph const &  _graph;
 };
 
 // Class Graph
@@ -137,7 +140,7 @@ private:
 
 
 	std::vector<Vertex>     _vertices;
-	std::vector<Edge> 		_edges;
+	std::vector<Edge> 	_edges;
 	
 };
 	

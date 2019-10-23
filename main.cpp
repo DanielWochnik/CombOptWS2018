@@ -1,6 +1,9 @@
 #include "graph.hpp"
 #include "randomgraph.hpp"
 #include <iostream>
+#include <map>
+#include <set>
+#include <queue>
 
 // Convenience. If you don't understand just ignore ;)
 using namespace DHBW;
@@ -9,27 +12,28 @@ using namespace DHBW;
 // What do I do?
 // The '&' in  front of g ensures that we do not copy g, 
 // it will be exactly the same Graph g as outside of this function
-VertexId example_function1(Graph & g)
+VertexId determine_vertice_with_max_edges(Graph & g)
 {
 	// This method is written unneccessary compliceted to give a better feeling of the use of this class
 	// EdgeId and GraphId are internally just the same as unsigned int's. I prefer using the aliases for 
 	// better readability.
-	EdgeId a;
+	
+	unsigned int max;
 	for (VertexId i = 0; i < g.num_vertices(); ++i)
 	{
 		// Get the i-th vertex
 		Vertex & v = g.vertex(i);
-		EdgeId b = 0;
+		unsigned int count = 0;
 		for (EdgeId e = 0;  e < v.num_edges(); ++ e)
 		{
-			++b;
+			++count;
 		}
-		if ( b > a)
+		if ( count > max)
 		{
-			a = b;
+			max = count;
 		}
 	}
-	return a;
+	return max;
 }
 
 // A vector is a kind of an dynamic_array. std::vector<VertexId> is a vector of VertexIds
@@ -60,11 +64,78 @@ std::vector<VertexId> random_path(Graph & g, VertexId s, VertexId t)
 	return path;
 }
 
+std::set<VertexId> graph_scan(Graph & g, VertexId s) 
+{
+	std::set<VertexId> reachable_vertices{s}; 
+	std::queue<VertexId> Q;
+	Q.push(s);
+	std::set<EdgeId> contained_edges;
+
+	while(!Q.empty()) {
+		VertexId v_id = Q.front();
+		Q.pop();
+
+		Vertex & v = g.vertex(v_id);
+
+		for(EdgeId e_id=0; e_id < v.num_edges(); e_id++) {
+			Edge e = g.edge(v.edge(e_id));
+			VertexId w_id = e.other_vertex(v_id);
+
+			if(reachable_vertices.find(w_id) == reachable_vertices.end())
+			{
+				reachable_vertices.insert(w_id);
+				contained_edges.insert(e.id());
+				Q.push(w_id);
+			}
+		}
+
+	}
+	
+	return reachable_vertices;
+}
+
+std::map<size_t, std::vector<VertexId>> determine_connected_comps(Graph & g)
+{
+	std::map<size_t, std::vector<VertexId>> connected_comps;
+	size_t comp_count = 0;
+
+	std::set<VertexId> total_vertices;
+	for(VertexId v=0; v < g.num_vertices(); v++)
+	{
+		total_vertices.insert(v);
+	}	
+	while(!total_vertices.empty())
+	{
+		std::set<VertexId>::iterator first = total_vertices.begin();
+		VertexId s = *first;
+		total_vertices.erase(first);
+	
+		std::set<VertexId> reachable_vertices = graph_scan(g, s);
+		for(auto v: reachable_vertices) {
+			total_vertices.erase(v);
+			connected_comps[comp_count].push_back(v);
+		}
+		comp_count++;
+	}
+	
+	return connected_comps;
+}
+
 
 int main()
 {	
 	// Read graph from input file 
 	Graph g("input/graph1.plain");
 	// Print to console, std::endl is (almost) equivalent to "\n"
-	std::cout << example_function1(g) << std::endl;
+	//std::cout << "Max edges: " << determine_vertice_with_max_edges(g) << std::endl;
+	std::map<size_t, std::vector<VertexId>> connected_comps = determine_connected_comps(g);
+	for(auto elem: connected_comps)
+	{
+		std::cout << elem.first << ": ";
+		for(auto v : elem.second)
+		{
+			std::cout << v << " ";
+		}
+		std::cout << std::endl;
+	}
 }

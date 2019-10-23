@@ -77,6 +77,7 @@ Edge::Edge(EdgeId id_, VertexId ep1_, VertexId ep2_, Graph const & graph_)
 	_ep2(ep2_),
 	_graph(graph_)
 {
+	assert(_id >= 0);
 	assert(_ep1 < _graph.num_vertices() and _ep2 < _graph.num_vertices());
 }
 

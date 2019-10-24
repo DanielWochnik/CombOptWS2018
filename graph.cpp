@@ -27,16 +27,18 @@ VertexId Vertex::id() const
 	return _id;
 }
 
-Vertex::Vertex(VertexId id_, Graph const & graph_)
+Vertex::Vertex(VertexId id_, Graph & graph_)
 :	
 	_id(id_),
 	_graph(graph_)
 {}
 	
-void Vertex::add_edge(EdgeId id)
+void Vertex::add_edge(EdgeId id, VertexId to)
 {
 	assert(_graph.edge(id).vertex1() == this->id() or _graph.edge(id).vertex2() == this->id());
 	_edges.push_back(id);
+	gamma_plus.push_back(to);
+	_graph.vertex(to).gamma_minus.push_back(_id);
 }
 
 //////////////////////////////////////
@@ -108,7 +110,9 @@ Edge const & Graph::edge(EdgeId id) const
 
 Edge & Graph::edge(EdgeId id)
 {
-	return const_cast<Edge&>(static_cast<Graph const*>(this)->edge(id));
+	// return const_cast<Edge&>(static_cast<Graph const*>(this)->edge(id));
+	assert(id < num_edges());
+	return _edges[id];
 }
 
 VertexId Graph::num_vertices() const
@@ -130,8 +134,8 @@ VertexId Graph::add_vertex()
 EdgeId Graph::add_edge(VertexId ep1, VertexId ep2)
 {
 	_edges.emplace_back(num_edges(),ep1,ep2,*this);
-	vertex(ep1).add_edge(num_edges()-1);
-	vertex(ep2).add_edge(num_edges()-1);
+	vertex(ep1).add_edge(num_edges()-1, ep2);
+	vertex(ep2).add_edge(num_edges()-1, ep1);
 
 	return num_edges()-1;
 }
@@ -208,5 +212,15 @@ void Graph::write_to_file_plain(std::string const & filename)
 		outfile << "\n" << edge.vertex1() << " " << edge.vertex2();
 	}
 }
+
+EdgeId Digraph::add_edge(VertexId ep1, VertexId ep2)
+{	
+	_edges.emplace_back(num_edges(), ep1, ep2, *this);
+	vertex(ep1).add_edge(num_edges()-1, ep2);
+	
+	return num_edges()-1;
+}
+
+
 	
 } // namespace DHBW

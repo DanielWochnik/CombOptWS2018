@@ -47,7 +47,7 @@ friend class DHBW::Graph;
 public:
 
 	// Define Construtor explicit to avoid copying of cities
-	explicit Vertex(VertexId id_, Graph const & graph_);
+	explicit Vertex(VertexId id_, Graph & graph_);
 
 	// Returns the number of Vertex edges i.e. the number of neighbour cities
 	EdgeId num_edges() const;
@@ -57,15 +57,21 @@ public:
 
 	// Getter for id
 	VertexId id() const;
-private:
+	
+	///////////
+	// Public Member
+	// Vertices reachable from v, and from which v is reachable
+	std::vector<VertexId> gamma_plus;
+	std::vector<VertexId> gamma_minus;
 	
 	// Add new Edge by id
-	void add_edge(EdgeId id);
+	void add_edge(EdgeId id, VertexId to);
 
+private:
 	//////////////
 	// Member 
 	VertexId const         _id;
-	Graph const &          _graph;
+	Graph &          _graph;
 	std::vector<EdgeId>    _edges;
 };
 
@@ -127,21 +133,30 @@ public:
 	
 	// add new edge
 	// returns the id of the new edge
-	EdgeId add_edge(VertexId ep1, VertexId ep2);
+	virtual EdgeId add_edge(VertexId ep1, VertexId ep2);
 	
 	// write graph to file
 	void write_to_file(std::string const & filename, GraphInputFormat format = GraphInputFormat::plain);
 	
-private:
 	// Read input file and create cities and edges
 	void read_from_file_plain(std::string const & filename);
-	
+
+protected:
 	void write_to_file_plain(std::string const & filename);
 
 
 	std::vector<Vertex>     _vertices;
 	std::vector<Edge> 	_edges;
-	
+};
+
+class Digraph : public Graph
+{
+public:
+	using Graph::Graph;
+	Digraph(std::string const & filename, GraphInputFormat format = GraphInputFormat::plain);
+
+	// adds new directed edge and returns its id
+	virtual EdgeId add_edge(VertexId ep1, VertexId ep2);
 };
 	
 } //namespace DHBW

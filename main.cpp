@@ -122,26 +122,71 @@ std::map<size_t, std::vector<VertexId>> determine_connected_comps(Graph & g)
 	return connected_comps;
 }
 
-
-int main(int argc, char *argv[])
-{	
-	size_t graph_no = 2;
-	
-	if(argc > 1) {
-		try {
-			graph_no = static_cast<size_t>(std::stoi(argv[1])); 
-		} catch (std::exception const &e) {
-			std::cout << "Failed to cast" << std::endl;
+void visit1(Graph & g, VertexId v_id, std::set<VertexId> & reached, size_t & n, std::map<size_t, VertexId> & psi_inv)
+{
+	reached.insert(v_id);
+	Vertex v = g.vertex(v_id);
+	for(auto w_id: v.gamma_plus)
+	{
+		if(reached.find(w_id) == reached.end())
+		{
+			visit1(g, w_id, reached, n, psi_inv);
 		}
 	}
-	std::cout << "Graph: " << graph_no << std::endl;
+	n++;
+	psi_inv[n] = v_id;
+}
 
-	std::string infile = "input/graph" + std::to_string(graph_no) + ".plain";
-	Graph g(infile);
+void visit2(Graph & g, VertexId v_id, std::set<VertexId> & reached, size_t & k, std::map<size_t, std::vector<VertexId>> & comp_inv)
+{
+	reached.insert(v_id);
+	Vertex v = g.vertex(v_id);
+	for(auto w_id: v.gamma_minus)
+	{
+		if(reached.find(w_id) == reached.end())
+		{
+			visit2(g, w_id, reached, k, comp_inv);
+		}
+	}
+
+	comp_inv[k].push_back(v_id);
+}
+
+std::map<size_t, std::vector<VertexId>> tarjan(Graph & g)
+{
+	std::set<VertexId> reached;
+	size_t n = 0;
+	std::map<size_t, VertexId> psi_inv;
+
+	for(VertexId v_id = 0; v_id < g.num_vertices(); v_id++)
+	{
+		if(reached.find(v_id) == reached.end())
+		{
+			visit1(g, v_id, reached, n, psi_inv);
+		}
+	}
 	
-	//std::cout << "Max edges: " << determine_vertice_with_max_edges(g) << std::endl;
+
+	reached.clear();
+	size_t k = 0;
+	std::map<size_t, std::vector<VertexId>> comp_inv;
+
+	for(size_t n_id = g.num_vertices(); n_id >= 1; n_id--)
+	{
+		VertexId v_id = psi_inv[n_id];
+		if(reached.find(v_id) == reached.end())
+		{
+			k++;
+			visit2(g, v_id, reached, k, comp_inv);
+		}
+	}
+
+	return comp_inv;
+};
+
+void write_zhk_graph(Graph & g, size_t graph_no)
+{	
 	std::map<size_t, std::vector<VertexId>> connected_comps = determine_connected_comps(g);
-	//std::cout << connected_comps.size() << std::endl;
 
 	std::ofstream fp;
 	std::string outfile = "zhk/graph" + std::to_string(graph_no) + ".plain";
@@ -157,10 +202,51 @@ int main(int argc, char *argv[])
 			}
 			fp << std::endl;
 		}
-	} else
-	{
-		return 1;
+	}	
+}
+
+void write_zhk_digraph(Digraph & g, size_t graph_no)
+{
+	std::map<size_t, std::vector<VertexId>> connected_comps = tarjan(g);
+
+	std::ofstream fp;
+	std::string outfile = "zhk/digraph" + std::to_string(graph_no) + ".plain";
+	fp.open(outfile);
+	if(fp) {
+		fp << connected_comps.size() << std::endl;
+		
+		for(auto elem: connected_comps)
+		{
+			for(auto v : elem.second)
+			{
+				fp << v << " ";
+			}
+			fp << std::endl;
+		}
+	}	
+}
+
+int main(int argc, char *argv[])
+{	
+	size_t graph_no = 2;
+	
+	if(argc > 1) {
+		try {
+			graph_no = static_cast<size_t>(std::stoi(argv[1])); 
+		} catch (std::exception const &e) {
+			std::cout << "Failed to cast" << std::endl;
+		}
 	}
+	std::cout << "Graph: " << graph_no << std::endl;
+	std::string infile = "input/graph" + std::to_string(graph_no) + ".plain";
+	Graph g(infile);
+	write_zhk_graph(g, graph_no);
+
+	std::cout << "Digraph: " << graph_no << std::endl;
+	infile = "input/digraph" + std::to_string(graph_no) + ".plain";
+	Digraph dig;
+	dig.read_from_file_plain(infile);
+	write_zhk_digraph(dig, graph_no);
 
 	return 0;
 	

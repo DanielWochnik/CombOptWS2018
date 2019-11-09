@@ -14,7 +14,3 @@ Wichtig:
  $ make
  $ ./prog.exe
  ```
-
-# Testinstanzen
-
-Kleinere Testinstanzen habe ich der Bequemlickeit halber zum Repo hinzugefügt. Weitere, etwas herausfordernde Instanzen finden sich hier: http://www.lehre.dhbw-stuttgart.de/~wochnik/2018/combopt/inputFiles/

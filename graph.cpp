@@ -77,6 +77,7 @@ Edge::Edge(EdgeId id_, VertexId ep1_, VertexId ep2_, Graph const & graph_)
 	_ep2(ep2_),
 	_graph(graph_)
 {
+	assert(_id >= 0);
 	assert(_ep1 < _graph.num_vertices() and _ep2 < _graph.num_vertices());
 }
 
@@ -123,6 +124,9 @@ VertexId Graph::add_vertex()
 EdgeId Graph::add_edge(VertexId ep1, VertexId ep2)
 {
 	_edges.emplace_back(num_edges(),ep1,ep2,*this);
+	vertex(ep1).add_edge(num_edges()-1);
+	vertex(ep2).add_edge(num_edges()-1);
+
 	return num_edges()-1;
 }
 
